@@ -1,0 +1,191 @@
+:root{
+  
+    --darkPurple : black; 
+    --mediumPurple: #5F03BD;
+    --lightPurple: #5a00ff;
+    --darkPink: #DF21FF;
+   
+  
+  
+}
+
+
+*{
+  margin:0;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace;
+  color: white;
+}
+
+body{
+  min-height: 100vh;
+  background-image: linear-gradient(to top, var(--darkPurple), 95%, var(--lightPurple));
+}
+
+button{
+  color: black;
+  cursor: pointer;
+}
+
+header{
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--lightPurple);
+  backdrop-filter: blur(2px);
+}
+
+header>div{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 150px;
+  padding: 0 20px;
+
+}
+
+header>div>div{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+
+
+}
+
+header div img{
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  border: 1px solid var(--lightPurple);
+  margin: 0 0 0 10px;
+}
+
+header button{
+
+}
+
+section {
+  min-height: calc(100vh - 420px);
+}
+section div{
+  height: 50px;
+  border: solid 1px var(--lightPurple);
+  
+}
+
+
+
+.player-section{
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+}
+
+.player-section>div:first-child{
+  width: 458px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: stretch;
+  border: none;
+  box-shadow: 10px 10px 10px -5px rgba(255,255,255, 0.16), -10px -10px 10px -8px rgba(200,200,200, 0.70);
+  border-radius: 20px;
+  padding: 0 20px;
+  position: absolute;
+  z-index: 1;
+  backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.creative-code-space{
+  width: 100%;
+  height: 100%;
+  background-image: url(https://www.creativefabrica.com/wp-content/uploads/2023/05/30/Purple-Neon-Lights-Background-Glow-Graphics-70955303-1.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.player-section h2{
+  font-size: 1.1em;
+}
+
+.player-section h3{
+  font-size: 1.1em;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--darkPink);
+  cursor: pointer;
+}
+
+input[type=range]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--darkPink);
+  cursor: pointer;
+}
+.button-box{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.button-box button{
+  appearance: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  margin: 0 10px;
+  background-color: transparent;
+  border: none;
+  box-shadow: 5px 5px 5px -1px rgba(0,0,0, 0.16), -5px -5px 5px -3px rgba(200,200,200, 0.70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.button-box button:nth-child(2) img{
+ 
+  transform: rotate(180deg);
+}
+
+
+.button-box button img{
+width: 40%;
+  
+}
+
+.button-box button:nth-child(3){
+ 
+  width: 45px;
+  height: 45px;
+}
+
+.button-box button:hover{
+ 
+  box-shadow: inset 5px 5px 5px -1px rgba(0,0,0, 0.16), inset -5px -5px 5px -1px rgba(200,200,200, 0.70);
+  
+}
