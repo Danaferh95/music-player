@@ -71,9 +71,9 @@ header button{
 section {
   min-height: calc(100vh - 420px);
 }
-section div{
-  height: 50px;
-  border: solid 1px var(--lightPurple);
+section>div{
+
+ 
   
 }
 
@@ -188,4 +188,19 @@ width: 40%;
  
   box-shadow: inset 5px 5px 5px -1px rgba(0,0,0, 0.16), inset -5px -5px 5px -1px rgba(200,200,200, 0.70);
   
+}
+
+.song-div{
+  height: 50px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin: 10px 0;
+  border-bottom: 0.2px dashed var(--mediumPurple);
+}
+
+.song-div:hover{
+  background-color:#DF21FF;
 }

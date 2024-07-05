@@ -14,7 +14,7 @@ import shuffleNoneBtn from "./assets/suffle-inactive.png";
 
 
 
-function MusciPlayer({songs, autoPlayNextTrack = true}) {
+function MusciPlayer({songs, autoPlayNextTrack=true, curTrack, setTheCurTrack}) {
 
   const [audio, setAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -29,7 +29,6 @@ function MusciPlayer({songs, autoPlayNextTrack = true}) {
   const [shuffled, setShuffled] = useState(false);
   const [looped, setLooped] = useState(false);
 
-  let [curTrack, setCurTrack] = useState(0);
 
   let trackList = songs;
  
@@ -220,8 +219,8 @@ function MusciPlayer({songs, autoPlayNextTrack = true}) {
   const previous = () => {
     const index = curTrack;
     index !== 0
-      ? setCurTrack((curTrack-1))
-      : setCurTrack((curTrack));
+      ? setTheCurTrack((curTrack-1))
+      : setTheCurTrack((curTrack));
   };
 
   const play = () => {
@@ -239,8 +238,8 @@ function MusciPlayer({songs, autoPlayNextTrack = true}) {
   const next = () => {
     const index = curTrack;
     index !== playlist.length - 1
-      ? setCurTrack((curTrack + 1))
-      : setCurTrack((curTrack));
+      ? setTheCurTrack((curTrack + 1))
+      : setTheCurTrack((curTrack));
   };
 
 

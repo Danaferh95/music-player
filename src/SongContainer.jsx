@@ -2,13 +2,16 @@ import { useState } from 'react'
 
 
 
-function SongContainer({title, artist, onPlay, onEdit, onDelete}) {
+function SongContainer({id, title, artist, onPlay, onEdit, onDelete}) {
 
   return (
-    <div>
+    <div className = "song-div" onClick={()=> onPlay(id)}>
       <span>{title} - {artist}</span>
-      <button onClick={() => onEdit(song)}>Edit</button>
-      <button onClick={() => onDelete(song)}>Delete</button>
+      <div>
+        <button onClick={() => onEdit(song)}>Edit</button>
+        <button onClick={() => onDelete(song)}>Delete</button>
+      </div>
+     
     </div>
   )
 }
