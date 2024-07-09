@@ -14,7 +14,7 @@ import shuffleNoneBtn from "./assets/suffle-inactive.png";
 
 
 
-function MusciPlayer({songs, autoPlayNextTrack=true, curTrack, setTheCurTrack}) {
+function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack}) {
 
   const [audio, setAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,7 +30,7 @@ function MusciPlayer({songs, autoPlayNextTrack=true, curTrack, setTheCurTrack}) 
   const [looped, setLooped] = useState(false);
 
 
-  let trackList = songs;
+  let trackList = tracks;
  
   let playlist = trackList;
  
@@ -57,7 +57,7 @@ function MusciPlayer({songs, autoPlayNextTrack=true, curTrack, setTheCurTrack}) 
 
   //Aqui cargamos el audio
   useEffect(() => {
-
+    
     //Aqui se crea un nuevo audio utilizando nuestro URL del array the objetos que le pasamos desde el HOME
     const audio = new Audio(trackList[curTrack].url);
     audio.load();
