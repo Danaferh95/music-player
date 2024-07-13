@@ -5,11 +5,9 @@ import userFoto from "../../music-player-backend/uploads/photos/profile.png";
 import { useNavigate } from 'react-router-dom'
 
 function Home({id_user}) {
-    const [tracks, setTracks] = useState([
-       
-    ]);
+    const [tracks, setTracks] = useState([]);
     const [curTrack, setCurTrack] = useState(0);
-    
+    const [isLoading, setIsLoading] = useState(false);
     // user temporal
 
     const [userId, setUserID] = useState(id_user);
@@ -58,6 +56,8 @@ useEffect(() =>{
 //Esta funcion se utiliza para cargar los archivos en el googledrive
     async function handleFileUpload(event) {
         event.preventDefault();
+        console.log("loading song..");
+        setIsLoading(true);
         const formData = new FormData(event.currentTarget);
 
         //Le vamos a mandar el id del usuario y su user name para que pueda crear la carpeta, o identificarla si es necesario
@@ -75,9 +75,10 @@ useEffect(() =>{
 
             //Si todo sale bien se agrega al estado de las tracks la nueva cancion con su url 
             console.log('File uploaded successfully:', data);
+            setIsLoading(false);
             const newTrack = {
                 id_track: data.trackData, //aqui retorna el ID creado
-                url: `http://localhost:4000/proxy?id=${data.fileId}`, //aqui va el url del servidor cuando cargue en render
+                url: data.url, //aqui va el url del servidor cuando cargue en render
                 title: data.title,
                 artist: data.artist,
                 id_user: data.id_user
@@ -188,10 +189,11 @@ useEffect(() =>{
                 <div className="creative-code-space"></div>
             </div>
             <section>
-                <form onSubmit={handleFileUpload} encType="multipart/form-data">
+                { !isLoading ? <form onSubmit={handleFileUpload} encType="multipart/form-data">
                     <input type="file" name="mp3file" accept=".mp3" />
                     <input type="submit" value="Add tracks" />
-                </form>
+                </form> : <p>Song is loading...please wait</p>}
+                
                 <div>
                     {tracks.length > 0 ? tracks.map(({ id_track, title, artist }, index) =>
                         <SongContainer key={id_track} id_track={id_track} title={title} artist={artist} onPlay={()=> onPlay(index)} onEdit = {onEdit} onDelete={onDelete} />
