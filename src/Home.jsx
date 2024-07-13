@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
 import SongContainer from './SongContainer';
 import userFoto from "../../music-player-backend/uploads/photos/profile.png";
+import { useNavigate } from 'react-router-dom'
 
-
-function Home() {
+function Home({id_user}) {
     const [tracks, setTracks] = useState([
        
     ]);
@@ -12,9 +12,10 @@ function Home() {
     
     // user temporal
 
-    const [userId, setUserID] = useState(1);
+    const [userId, setUserID] = useState(id_user);
     const [activeUser, setActiveUser] = useState(null);
 
+    let navigate = useNavigate()
 
 //Este use Effect lo vamos a usar para identificar el usuario que se encuentra loggado
    useEffect(() =>{
@@ -33,9 +34,9 @@ function Home() {
 
     }, [])
 
-    console.log(tracks);
+ 
 
-   /* console.log(activeUser.id_user);
+   /*console.log(activeUser.id_user);
     console.log(activeUser.user_name);*/
 
 //Este use Effect lo vamos a usar para cargar las canciones
@@ -151,13 +152,31 @@ useEffect(() =>{
         }
     }
 
+    async function logOut() {
+        try {
+          const response = await fetch("http://localhost:4000/logout", {
+            method: "GET"
+          });
+          const data = await response.json();
+          console.log(data);
+          if (data.message === 'Logged out successfully') {
+            // Perform any additional logout actions, like redirecting to the login page
+            
+            return navigate("/login")
+            console.log("User logged out");
+          }
+        } catch (error) {
+          console.error('Error logging out:', error);
+        }
+      }
+
     return (
         <>
             <header>
                 <div>
                     <div>
-                        <span>Username</span>
-                        <button onClick={() => console.log("LogOut")}>Logout</button>
+                        <span>{ activeUser ? activeUser.user_name : "usuario"}</span>
+                        <button onClick={() => logOut()}>Logout</button>
                     </div>
                     <img src={userFoto} alt="User" />
                 </div>
