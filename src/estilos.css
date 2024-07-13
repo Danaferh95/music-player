@@ -204,3 +204,8 @@ width: 40%;
 .song-div:hover{
   background-color:#DF21FF;
 }
+
+
+.invisible {
+  display: none;
+}

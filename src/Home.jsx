@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
 import SongContainer from './SongContainer';
-import userFoto from "../../music-player-back/uploads/photos/profile.png";
-import song1 from "../../mymusic/Escape-Just Escape.mp3";
-import song2 from "../../mymusic/HotSince82-Restless.mp3";
-import song3 from "../../mymusic/Betoko-Just Live.mp3";
+import userFoto from "../../music-player-backend/uploads/photos/profile.png";
+
 
 function Home() {
     const [tracks, setTracks] = useState([
@@ -101,8 +99,39 @@ useEffect(() =>{
         setTheCurTrack(index);
     }
 
-    function onEdit(id_track) {
-        console.log(id_track);
+    async function onEdit(id_track, title, artist) {
+
+        //console.log(id_track, title, artist);
+
+        let trackToChange = tracks.find( track => track.id_track === id_track);
+        trackToChange.title = title;
+        trackToChange.artist = artist;
+        
+        let updatedTracks = tracks.map(tracks => tracks);
+        setTracks(updatedTracks);
+
+        // Make the PUT request to update the database
+        const updateBD = await fetch(`http://localhost:4000/updateTrack/${id_track}`, {
+
+            method: 'PUT',
+            body: JSON.stringify({ title: title, artist: artist }),
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            
+        });
+
+        const response = await updateBD.json();
+
+        if (response.error) {
+            console.error('Error updating track:', response.error);
+        } else {
+            console.log('Track updated successfully:', response);
+        }
+
+
+
+        
     }
 
     async function onDelete(id_track) {
