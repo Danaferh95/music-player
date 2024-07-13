@@ -17,7 +17,7 @@ function Home({id_user}) {
 
 //Este use Effect lo vamos a usar para identificar el usuario que se encuentra loggado
    useEffect(() =>{
-        fetch(`http://localhost:4000/user/${userId}`)
+        fetch(`https://music-player-backend-oawm.onrender.com/user/${userId}`)
         .then(respuesta => respuesta.json())
         .then( respuesta => {
            if(respuesta.error){
@@ -40,7 +40,7 @@ function Home({id_user}) {
 //Este use Effect lo vamos a usar para cargar las canciones
 
 useEffect(() =>{
-    fetch(`http://localhost:4000/tracks/${userId}`)
+    fetch(`https://music-player-backend-oawm.onrender.com/tracks/${userId}`)
     .then(respuesta => respuesta.json())
     .then( respuesta => {
        if(respuesta.error){
@@ -66,7 +66,7 @@ useEffect(() =>{
 
         //Aqui hacemos el fetch para hacer el upload a la carpeta que necesitamos
 
-        fetch('http://localhost:4000/upload', {
+        fetch('https://music-player-backend-oawm.onrender.com/upload', {
             method: 'POST',
             body: formData,
         })
@@ -113,7 +113,7 @@ useEffect(() =>{
         setTracks(updatedTracks);
 
         // Make the PUT request to update the database
-        const updateBD = await fetch(`http://localhost:4000/updateTrack/${id_track}`, {
+        const updateBD = await fetch(`https://music-player-backend-oawm.onrender.com/updateTrack/${id_track}`, {
 
             method: 'PUT',
             body: JSON.stringify({ title: title, artist: artist }),
@@ -138,7 +138,7 @@ useEffect(() =>{
 
     async function onDelete(id_track) {
         try {
-            const response = await fetch(`http://localhost:4000/delete-file/${id_track}`, {
+            const response = await fetch(`https://music-player-backend-oawm.onrender.com/delete-file/${id_track}`, {
                 method: 'DELETE'
             });
 
@@ -155,7 +155,7 @@ useEffect(() =>{
 
     async function logOut() {
         try {
-          const response = await fetch("http://localhost:4000/logout", {
+          const response = await fetch("https://music-player-backend-oawm.onrender.com/logout", {
             method: "GET"
           });
           const data = await response.json();
