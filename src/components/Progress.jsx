@@ -20,18 +20,16 @@ export const Progress = ({
         onMouseUp={onMouseUp}
         onTouchEnd={onTouchEnd}
         style={{
-          background: `linear-gradient(90deg, var(--darkPink) 0%, #ffffff ${Math.floor(
+          background: `linear-gradient(90deg, var(--color2) 0%, #ffffff ${Math.floor(
             value
           )}%, white ${Math.floor(
             value
           )}%, white ${Math.floor(
             progress
-          )}%, var(--lightPurple) ${Math.floor(
+          )}%, var(--color3) ${Math.floor(
             progress
-          )}%, black 100%)`,
-          // background: `linear-gradient(90deg, var(--progressUsed) ${Math.floor(
-          //   value
-          // )}%, var(--progressLeft) ${Math.floor(value)}%)`,
+          )}%, black 100%)`
+          
         }}
       />
     </div>

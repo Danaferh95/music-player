@@ -1,5 +1,8 @@
 import { useState } from 'react'
-
+//iconos
+import editIcon from "./assets/edit-icon.png";
+import saveIcon from "./assets/save-icon.png";
+import deleteIcon from "./assets/delete-icon.png";
 
 
 function SongContainer({id_track, title, artist, onPlay, onEdit, onDelete},) {
@@ -18,7 +21,7 @@ function SongContainer({id_track, title, artist, onPlay, onEdit, onDelete},) {
     </div>
     <span className= {editando ? "invisible" : ""}>{title} - {artist}</span>
 
-      <div>
+      <div className = "song-div-button-container">
         <button  onClick= { (e) => {
 
                                   e.stopPropagation();
@@ -34,9 +37,9 @@ function SongContainer({id_track, title, artist, onPlay, onEdit, onDelete},) {
                                   }
                                   
                               }
-                          } > {editando ? "save" : "edit"}
+                          } > {editando ? <img src={saveIcon} alt="" /> : <img src={editIcon} alt="" />}
         </button>
-        <button onClick={(event) => {event.stopPropagation(); onDelete(id_track)} }>Delete</button>
+        <button onClick={(event) => {event.stopPropagation(); onDelete(id_track)} }><img src={deleteIcon} alt="" /></button>
       </div>
      
     </div>

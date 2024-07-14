@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import MusicPlayer from './MusicPlayer';
 import SongContainer from './SongContainer';
-import userFoto from "../../music-player-backend/uploads/photos/profile.png";
+import userFoto from "./assets/profile.png";
 import { useNavigate } from 'react-router-dom'
+import CodeEffect from './CodeEffect';
 
 function Home({id_user}) {
     const [tracks, setTracks] = useState([]);
     const [curTrack, setCurTrack] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    // user temporal
+ 
 
     const [userId, setUserID] = useState(id_user);
     const [activeUser, setActiveUser] = useState(null);
@@ -16,42 +17,36 @@ function Home({id_user}) {
     let navigate = useNavigate()
 
 //Este use Effect lo vamos a usar para identificar el usuario que se encuentra loggado
-   useEffect(() =>{
+
+    useEffect(() =>{
         fetch(`https://music-player-backend-oawm.onrender.com/user/${userId}`)
         .then(respuesta => respuesta.json())
         .then( respuesta => {
-           if(respuesta.error){
-                //return navigate("/login");
+            if(respuesta.error){
                 console.log("no user logged in");
-           }
-           console.log(respuesta);
-           setActiveUser(respuesta);
+            }
+            
+            setActiveUser(respuesta);
 
         })
         .catch( error => console.error("No existe usuario", error));
 
     }, [])
 
- 
 
-   /*console.log(activeUser.id_user);
-    console.log(activeUser.user_name);*/
+    //Este use Effect lo vamos a usar para cargar las canciones
 
-//Este use Effect lo vamos a usar para cargar las canciones
+    useEffect(() =>{
+        fetch(`https://music-player-backend-oawm.onrender.com/tracks/${userId}`)
+        .then(respuesta => respuesta.json())
+        .then( respuesta => {
+        if(respuesta.error){
+                console.log("no user logged in");
+        }
+        setTracks(respuesta);
 
-useEffect(() =>{
-    fetch(`https://music-player-backend-oawm.onrender.com/tracks/${userId}`)
-    .then(respuesta => respuesta.json())
-    .then( respuesta => {
-       if(respuesta.error){
-            //return navigate("/login");
-            console.log("no user logged in");
-       }
-       console.log(respuesta);
-       setTracks(respuesta);
-
-    })
-}, []) 
+        })
+    }, []) 
 
 //Esta funcion se utiliza para cargar los archivos en el googledrive
     async function handleFileUpload(event) {
@@ -66,15 +61,15 @@ useEffect(() =>{
 
         //Aqui hacemos el fetch para hacer el upload a la carpeta que necesitamos
 
-        fetch('https://music-player-backend-oawm.onrender.com/upload', {
+        await fetch('https://music-player-backend-oawm.onrender.com/upload', {
             method: 'POST',
             body: formData,
         })
-        .then(response => response.json())
+        .then(respuesta => respuesta.json())
         .then(data => {
 
             //Si todo sale bien se agrega al estado de las tracks la nueva cancion con su url 
-            console.log('File uploaded successfully:', data);
+            console.log('returning:', data);
             setIsLoading(false);
             const newTrack = {
                 id_track: data.trackData, //aqui retorna el ID creado
@@ -103,7 +98,7 @@ useEffect(() =>{
 
     async function onEdit(id_track, title, artist) {
 
-        //console.log(id_track, title, artist);
+        //Aqui cambiamos la información del track en el front
 
         let trackToChange = tracks.find( track => track.id_track === id_track);
         trackToChange.title = title;
@@ -112,64 +107,58 @@ useEffect(() =>{
         let updatedTracks = tracks.map(tracks => tracks);
         setTracks(updatedTracks);
 
-        // Make the PUT request to update the database
-        const updateBD = await fetch(`https://music-player-backend-oawm.onrender.com/updateTrack/${id_track}`, {
+        // Aqui hacemos el request para actualizar el track
+        await fetch(`https://music-player-backend-oawm.onrender.com/updateTrack/${id_track}`, {
 
             method: 'PUT',
             body: JSON.stringify({ title: title, artist: artist }),
             headers: {
             'Content-Type': 'application/json'
-            },
+            }
             
-        });
-
-        const response = await updateBD.json();
-
-        if (response.error) {
-            console.error('Error updating track:', response.error);
-        } else {
-            console.log('Track updated successfully:', response);
-        }
-
-
-
+        })
+        .then(respuesta => console.log('Track updated successfully:', respuesta))
+        .catch(error => console.error('Error updating track:', error));
         
     }
 
     async function onDelete(id_track) {
-        try {
-            const response = await fetch(`https://music-player-backend-oawm.onrender.com/delete-file/${id_track}`, {
-                method: 'DELETE'
-            });
 
-            if (response.ok) {
+        await fetch(`https://music-player-backend-oawm.onrender.com/delete-file/${id_track}`, {
+            method: 'DELETE'
+        })
+        .then(respuesta => {
+            if (respuesta.ok) {
                 setTracks(tracks.filter(track => track.id_track !== id_track));
                 console.log('Track deleted successfully');
             } else {
                 console.error('Failed to delete track');
             }
-        } catch (error) {
+        })
+        .catch(error => {
             console.error('Error deleting track:', error);
-        }
+        });
+
     }
 
     async function logOut() {
-        try {
-          const response = await fetch("https://music-player-backend-oawm.onrender.com/logout", {
+
+        await fetch("https://music-player-backend-oawm.onrender.com/logout", {
             method: "GET"
-          });
-          const data = await response.json();
-          console.log(data);
-          if (data.message === 'Logged out successfully') {
-            // Perform any additional logout actions, like redirecting to the login page
-            
-            return navigate("/login")
-            console.log("User logged out");
-          }
-        } catch (error) {
-          console.error('Error logging out:', error);
-        }
-      }
+        })
+        .then(respuesta => respuesta.json())
+        .then(respuesta => {
+            console.log(respuesta);
+            if (respuesta.message === 'Logged out successfully') {
+                navigate("/login");
+            } else {
+                console.error('Failed to log out');
+            }
+        })
+        .catch(error => {
+            console.error('Error logging out:', error);
+        });
+    }
 
     return (
         <>
@@ -185,19 +174,22 @@ useEffect(() =>{
             <div className="player-section">
                 {tracks.length >  0 ? (
                 <MusicPlayer tracks={tracks} autoPlayNextTrack={true} curTrack={curTrack} setTheCurTrack={setTheCurTrack} />
-                ) : ( <p> Loading tracks...</p> ) }
-                <div className="creative-code-space"></div>
+                ) : ( <p> Looking for tracks...</p> ) }
+                <div className="creative-code-space">
+                <CodeEffect />
+                </div>
             </div>
-            <section>
-                { !isLoading ? <form onSubmit={handleFileUpload} encType="multipart/form-data">
+            { !isLoading ? <form className = "upload-song-form" onSubmit={handleFileUpload} encType="multipart/form-data">
                     <input type="file" name="mp3file" accept=".mp3" />
                     <input type="submit" value="Add tracks" />
                 </form> : <p>Song is loading...please wait</p>}
+            <section>
+              
                 
                 <div>
                     {tracks.length > 0 ? tracks.map(({ id_track, title, artist }, index) =>
                         <SongContainer key={id_track} id_track={id_track} title={title} artist={artist} onPlay={()=> onPlay(index)} onEdit = {onEdit} onDelete={onDelete} />
-                    ) : <p>No existen canciones</p>}
+                    ) : <p>¡Add some songs!</p>}
                 </div>
             </section>
         </>

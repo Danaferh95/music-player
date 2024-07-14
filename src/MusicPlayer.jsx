@@ -14,7 +14,7 @@ import shuffleNoneBtn from "./assets/suffle-inactive.png";
 
 
 
-function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack}) {
+function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
 
   const [audio, setAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,17 +30,12 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
   const [looped, setLooped] = useState(false);
 
 
-  let trackList = tracks;
- 
-  let playlist = trackList;
- 
- 
-
+  let playlist = tracks;
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = Math.floor(seconds % 60);
-  
+
     const formattedHours = hours > 0 ? hours.toString() + ":" : "";
     const formattedMinutes =
       minutes < 10 && hours > 0
@@ -50,22 +45,23 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
       remainingSeconds < 10
         ? "0" + remainingSeconds.toString()
         : remainingSeconds.toString();
-  
+
     return formattedHours + formattedMinutes + formattedSeconds;
   };
 
 
-  //Aqui cargamos el audio
+    //Aqui cargamos el audio
   useEffect(() => {
-    
     //Aqui se crea un nuevo audio utilizando nuestro URL del array the objetos que le pasamos desde el HOME
-    const audio = new Audio(trackList[curTrack].url);
+    const audio = new Audio(playlist[curTrack].url);
     audio.load();
 
     //Entonces en setAudioData le decimos cuando dura el audio con la propiedad audio.duration, y seteamos el audio.currentTime que por default es 0
     const setAudioData = () => {
-      setLength(audio.duration);
-      setTime(audio.currentTime);
+      if (audio.readyState >= 2) { // Check if audio data is ready
+        setLength(audio.duration);
+        setTime(audio.currentTime);
+      }
     };
 
     //Para hacer set del tiempo creamos el curTime que va a ser igual al audio.currentTime de ese momento. En setTime le pasamos curTime, para el setSlider indicamos
@@ -76,17 +72,17 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
       setSlider(curTime ? ((curTime * 100) / audio.duration).toFixed(1) : 0);
     };
 
-
     // Aqui vemos cuanto del audio se a cargado y hasta que momento se quedo, lo dividimos por el total que es el audio.duration y multiplicamos por 100 para que
     //nos retorn un valor en porcentaje, en setBuffer le decimos que tenga máximo 2 decimales.
     const setAudioProgress = () => {
-      const bufferedPercentage = (audio.buffered.end(0) / audio.duration) * 100;
-      setBuffer(bufferedPercentage.toFixed(2));
+      if (audio.buffered.length > 0) { // Ensure there is at least one buffered range
+        const bufferedPercentage = (audio.buffered.end(0) / audio.duration) * 100;
+        setBuffer(bufferedPercentage.toFixed(2));
+      }
     };
 
- 
     const setAudioEnd = () => setHasEnded(!hasEnded);
-  
+
     audio.addEventListener("loadeddata", setAudioData);
     audio.addEventListener("timeupdate", setAudioTime);
     audio.addEventListener("progress", setAudioProgress);
@@ -94,9 +90,7 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
     audio.addEventListener("ended", setAudioEnd);
 
     setAudio(audio);
-    setTitle(trackList[curTrack].title);
-
-    
+    setTitle(playlist[curTrack].title);
 
     return () => {
       audio.removeEventListener("loadeddata", setAudioData);
@@ -109,15 +103,17 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
     };
   }, []);
 
+
+
   //Este use effect sirve cuando actualizamos nuestro current track a uno nuevo
 
   useEffect(() => {
     if (audio) {
-      audio.src = trackList[curTrack].url;
+      audio.src = playlist[curTrack].url;
       audio.load();
 
       audio.oncanplay = () => {
-        setTitle(trackList[curTrack].title);
+        setTitle(playlist[curTrack].title);
         play();
       };
 
@@ -163,64 +159,56 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
     }
   }, [drag]);
 
+
+ 
+
   useEffect(() => {
-    if (audio) {
-      if (shuffled) {
-        playlist = shufflePlaylist(playlist);
-      }
+    if (hasEnded) {
       if (looped) {
+        audio.currentTime = 0;
         play();
-      } else if (autoPlayNextTrack && !looped) {
+      } else if (autoPlayNextTrack) {
         next();
       } else {
         setIsPlaying(false);
       }
+      setHasEnded(false); // Reset hasEnded state
     }
   }, [hasEnded]);
-
-  useEffect(() => {
-    if (audio) {
-      let setAudioEnd;
-
-      if (looped) {
-        setAudioEnd = () => {
-          audio.currentTime = 0;
-          play();
-        };
-      } else {
-        setAudioEnd = () => {
-          setHasEnded(!hasEnded);
-        };
-      }
-
-      audio.addEventListener("ended", setAudioEnd);
-
-      return () => {
-        audio.removeEventListener("ended", setAudioEnd);
-      };
-    }
-  }, [looped]);
 
 
   const loop = () => {
     setLooped(!looped);
   };
 
+
   const shuffle = () => {
     setShuffled(!shuffled);
   };
 
-  const shufflePlaylist = (arr) => {
-    if (arr.length === 1) return arr;
-    const rand = Math.floor(Math.random() * arr.length);
-    return [arr[rand], ...shufflePlaylist(arr.filter((_, i) => i !== rand))];
+  const next = () => {
+    const index = curTrack;
+    if (shuffled) {
+      const randomTrackIndex = Math.floor(Math.random() * playlist.length);
+      setTheCurTrack(randomTrackIndex);
+    } else {
+      index !== playlist.length - 1
+        ? setTheCurTrack((curTrack + 1))
+        : setTheCurTrack((curTrack));
+    }
   };
+
 
   const previous = () => {
     const index = curTrack;
-    index !== 0
-      ? setTheCurTrack((curTrack-1))
-      : setTheCurTrack((curTrack));
+    if (shuffled) {
+      const randomTrackIndex = Math.floor(Math.random() * playlist.length);
+      setTheCurTrack(randomTrackIndex);
+    }else {
+      index !== 0
+        ? setTheCurTrack((curTrack-1))
+        : setTheCurTrack((curTrack));
+    }
   };
 
   const play = () => {
@@ -232,16 +220,6 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
     setIsPlaying(false);
     audio.pause();
   };
-
- 
-
-  const next = () => {
-    const index = curTrack;
-    index !== playlist.length - 1
-      ? setTheCurTrack((curTrack + 1))
-      : setTheCurTrack((curTrack));
-  };
-
 
 
   return (
@@ -288,4 +266,4 @@ function MusciPlayer({tracks, autoPlayNextTrack=true, curTrack, setTheCurTrack})
   )
 }
 
-export default MusciPlayer
+export default MusicPlayer
