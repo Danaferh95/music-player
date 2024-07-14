@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 
 
-import { Progress } from "./components/Progress";
+import { Progress } from "./Progress";
 
 //Iconos
-import loopCurrentBtn from "./assets/loop-active.png";
-import loopNoneBtn from "./assets/loop-inactive.png";
-import playBtn from "./assets/play.png";
-import pauseBtn from "./assets/pause.png";
-import nextPrevBtn from "./assets/next-previous.png";
-import shuffleAllBtn from "./assets/suffle-active.png";
-import shuffleNoneBtn from "./assets/suffle-inactive.png";
+import loopCurrentBtn from "../assets/loop-active.png";
+import loopNoneBtn from "../assets/loop-inactive.png";
+import playBtn from "../assets/play.png";
+import pauseBtn from "../assets/pause.png";
+import nextPrevBtn from "../assets/next-previous.png";
+import shuffleAllBtn from "../assets/suffle-active.png";
+import shuffleNoneBtn from "../assets/suffle-inactive.png";
 
 
 

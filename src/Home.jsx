@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import MusicPlayer from './MusicPlayer';
-import SongContainer from './SongContainer';
+import MusicPlayer from './components/MusicPlayer';
+import SongContainer from './components/SongContainer';
 import userFoto from "./assets/profile.png";
 import { useNavigate } from 'react-router-dom'
-import CodeEffect from './CodeEffect';
+import CodeEffect from './components/CodeEffect';
 
 function Home({id_user}) {
     const [tracks, setTracks] = useState([]);

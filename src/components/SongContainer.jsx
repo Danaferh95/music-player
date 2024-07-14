@@ -1,8 +1,8 @@
 import { useState } from 'react'
 //iconos
-import editIcon from "./assets/edit-icon.png";
-import saveIcon from "./assets/save-icon.png";
-import deleteIcon from "./assets/delete-icon.png";
+import editIcon from "../assets/edit-icon.png";
+import saveIcon from "../assets/save-icon.png";
+import deleteIcon from "../assets/delete-icon.png";
 
 
 function SongContainer({id_track, title, artist, onPlay, onEdit, onDelete},) {

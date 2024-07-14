@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DatosUsuario } from './Usuario.jsx'
-import CodeEffect from './CodeEffect';
+import CodeEffect from './components/CodeEffect';
 function Login() {
 
   let [nombreUsuario, setUsuario] = useState("")
