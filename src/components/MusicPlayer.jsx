@@ -1,5 +1,16 @@
+/*
+
+Este componente gestionara la carga de la cancion, el play, pause, next, previous, loop y shuffle
+
+A continuación explicaremos más a detalle como funciona cada sección
+
+
+*/
+
+
 import { useState, useEffect } from 'react'
 
+//Este es el componente de la barra de progreso
 
 import { Progress } from "./Progress";
 
@@ -13,24 +24,40 @@ import shuffleAllBtn from "../assets/suffle-active.png";
 import shuffleNoneBtn from "../assets/suffle-inactive.png";
 
 
+//Empezamos creando el componente que recibe el array de las tracks, la variable de true del autoPLayeNextTrack, el curTrack q es la track actual que se
+//esta en play, y el setCurTrack para actualizarala cuando sea necesario 
 
 function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
 
+
+  //aqui asignamos la variable de nuestra cancion
   const [audio, setAudio] = useState(null);
+  //variable para identificar si esta sonando la cancion o no
   const [isPlaying, setIsPlaying] = useState(false);
+  // variable para identificar si la cancion ya termino
   const [hasEnded, setHasEnded] = useState(false);
+  //el titulo de nuestra cancion que aparecera en el reproductor
   const [title, setTitle] = useState("");
+  //variable que seteara el largo de la cancion
   const [length, setLength] = useState(0);
+  //variable que setea el tiempo que dura la cancion
   const [time, setTime] = useState(0);
+  //el Slider de nuestro Progress ---------------
   const [slider, setSlider] = useState(1);
+  //variable que almacena el buffer de la cancion(es decir la data que se encuentra cargada)
   const [buffer, setBuffer] = useState(0);
+  //variable con nuestro drag -----------------
   const [drag, setDrag] = useState(0);
- 
+ //varibale para activar o no el shuffle
   const [shuffled, setShuffled] = useState(false);
+  //variable para activar o no el loop
   const [looped, setLooped] = useState(false);
 
 
+  //nuestra variable playlist que almacenará el array de tracks que recibimos del Home.jsx
   let playlist = tracks;
+
+  //Funcion para convertir los segundos en un formato legible de horas, minutos y segundos. Recibe "seconds", que son los segundos
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -45,63 +72,78 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
       remainingSeconds < 10
         ? "0" + remainingSeconds.toString()
         : remainingSeconds.toString();
-
+    //Combina las horas, minutos y segundos formateados en una sola cadena y la devuelve. Por ejemplo, formatTime(3665) devolverá "1:01:05".
     return formattedHours + formattedMinutes + formattedSeconds;
   };
 
 
     //Aqui cargamos el audio
-  useEffect(() => {
-    //Aqui se crea un nuevo audio utilizando nuestro URL del array the objetos que le pasamos desde el HOME
-    const audio = new Audio(playlist[curTrack].url);
-    audio.load();
-
-    //Entonces en setAudioData le decimos cuando dura el audio con la propiedad audio.duration, y seteamos el audio.currentTime que por default es 0
-    const setAudioData = () => {
-      if (audio.readyState >= 2) { // Check if audio data is ready
-        setLength(audio.duration);
-        setTime(audio.currentTime);
-      }
-    };
-
-    //Para hacer set del tiempo creamos el curTime que va a ser igual al audio.currentTime de ese momento. En setTime le pasamos curTime, para el setSlider indicamos
-    //si ya existe curTime , entonces hacemos un calculo de en q posicion debería estar el slider de acuerdo a la duration, y sino empieza en 0.
-    const setAudioTime = () => {
-      const curTime = audio.currentTime;
-      setTime(curTime);
-      setSlider(curTime ? ((curTime * 100) / audio.duration).toFixed(1) : 0);
-    };
-
-    // Aqui vemos cuanto del audio se a cargado y hasta que momento se quedo, lo dividimos por el total que es el audio.duration y multiplicamos por 100 para que
-    //nos retorn un valor en porcentaje, en setBuffer le decimos que tenga máximo 2 decimales.
-    const setAudioProgress = () => {
-      if (audio.buffered.length > 0) { // Ensure there is at least one buffered range
-        const bufferedPercentage = (audio.buffered.end(0) / audio.duration) * 100;
-        setBuffer(bufferedPercentage.toFixed(2));
-      }
-    };
-
-    const setAudioEnd = () => setHasEnded(!hasEnded);
-
-    audio.addEventListener("loadeddata", setAudioData);
-    audio.addEventListener("timeupdate", setAudioTime);
-    audio.addEventListener("progress", setAudioProgress);
-    /*audio.addEventListener("volumechange", setAudioVolume);*/
-    audio.addEventListener("ended", setAudioEnd);
-
-    setAudio(audio);
-    setTitle(playlist[curTrack].title);
-
-    return () => {
-      audio.removeEventListener("loadeddata", setAudioData);
-      audio.removeEventListener("timeupdate", setAudioTime);
-      audio.removeEventListener("progress", setAudioProgress);
-      /*audio.removeEventListener("volumechange", setAudioVolume);*/
-      audio.removeEventListener("ended", setAudioEnd);
-      audio.pause();
-      audio.src = "";
-    };
-  }, []);
+    useEffect(() => {
+      // Aquí se crea un nuevo objeto de audio utilizando la URL del array de objetos que le pasamos desde el componente HOME.
+      const audio = new Audio(playlist[curTrack].url);
+      
+      // Cargamos el archivo de audio.
+      audio.load();
+    
+      // Esta función se llama cuando los datos del audio están listos. 
+      // Establecemos la duración del audio y el tiempo actual (que por defecto es 0).
+      const setAudioData = () => {
+        // Verificamos si los datos del audio están listos (readyState >= 2).
+        if (audio.readyState >= 2) {
+          // Establecemos la duración del audio.
+          setLength(audio.duration);
+          // Establecemos el tiempo actual del audio.
+          setTime(audio.currentTime);
+        }
+      };
+    
+      // Esta función se llama para actualizar el tiempo actual del audio y la posición del slider.
+      const setAudioTime = () => {
+        // Obtenemos el tiempo actual del audio.
+        const curTime = audio.currentTime;
+        // Establecemos el tiempo actual del audio.
+        setTime(curTime);
+        // Calculamos la posición del slider como un porcentaje del tiempo total del audio.
+        setSlider(curTime ? ((curTime * 100) / audio.duration).toFixed(1) : 0);
+      };
+    
+      // Esta función se llama para actualizar el progreso del buffer del audio.
+      const setAudioProgress = () => {
+        // Verificamos si hay al menos un rango de buffer.
+        if (audio.buffered.length > 0) {
+          // Calculamos el porcentaje de buffer cargado y lo establecemos.
+          const bufferedPercentage = (audio.buffered.end(0) / audio.duration) * 100;
+          setBuffer(bufferedPercentage.toFixed(2));
+        }
+      };
+    
+      // Esta función se llama cuando el audio ha terminado de reproducirse.
+      const setAudioEnd = () => setHasEnded(!hasEnded);
+    
+      // Agregamos los listeners para manejar los eventos del audio.
+      audio.addEventListener("loadeddata", setAudioData);
+      audio.addEventListener("timeupdate", setAudioTime);
+      audio.addEventListener("progress", setAudioProgress);
+      audio.addEventListener("ended", setAudioEnd);
+    
+      // Guardamos el objeto de audio en nuestra variable de estado.
+      setAudio(audio);
+      // Establecemos el título de la canción actual utilizando el índice del track actual en la playlist.
+      setTitle(playlist[curTrack].title);
+    
+      // Esta función de limpieza se ejecuta cuando el componente se desmonta o se actualiza.
+      return () => {
+        // Quitamos los listeners del audio para evitar fugas de memoria.
+        audio.removeEventListener("loadeddata", setAudioData);
+        audio.removeEventListener("timeupdate", setAudioTime);
+        audio.removeEventListener("progress", setAudioProgress);
+        audio.removeEventListener("ended", setAudioEnd);
+        // Pausamos el audio y limpiamos su fuente.
+        audio.pause();
+        audio.src = "";
+      };
+    }, []); // Este efecto se ejecuta solo una vez, cuando el componente se crea.
+    
 
 
 
@@ -161,7 +203,7 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
 
 
  
-
+//Este useEffect se dispara cuando cambia el estado de hasEnded, donde si esque se encuentra 
   useEffect(() => {
     if (hasEnded) {
       if (looped) {
@@ -177,45 +219,55 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
   }, [hasEnded]);
 
 
+  // Seteamos el estado de loop a true o false si esque se activa o no con el boton
   const loop = () => {
     setLooped(!looped);
   };
 
-
+// Seteamos el estado de shuffle a true o false si esque se activa o no con el boton
   const shuffle = () => {
     setShuffled(!shuffled);
   };
 
+  //funcion para dar play al siguiente elemento dentro del array de playlist. 
   const next = () => {
+    //curTrack nos sirve como el indice
     const index = curTrack;
+
+    //vemos si shuffle esta activo, si es asi hacemos un random y el setTheCurTrack ahora es un numero al azar
     if (shuffled) {
       const randomTrackIndex = Math.floor(Math.random() * playlist.length);
       setTheCurTrack(randomTrackIndex);
     } else {
-      index !== playlist.length - 1
+      //sino entonces como es un next verificamos si es menor al length del playlist y sumamos 1, sino regresa al inicio
+      index < playlist.length - 1
         ? setTheCurTrack((curTrack + 1))
-        : setTheCurTrack((curTrack));
+        : setTheCurTrack(0);
     }
   };
 
-
+ //funcion para dar play al elemento previo dentro del array de playlist. 
   const previous = () => {
+    //curTrack nos sirve como el indice
     const index = curTrack;
+     //vemos si shuffle esta activo, si es asi hacemos un random y el setTheCurTrack ahora es un numero al azar
     if (shuffled) {
       const randomTrackIndex = Math.floor(Math.random() * playlist.length);
       setTheCurTrack(randomTrackIndex);
     }else {
-      index !== 0
+      //sino entonces como es un prev verificamos si es mayor a 0 y restamos 1, sino nos vamos a la ultima cancion del playlist
+      index > 0
         ? setTheCurTrack((curTrack-1))
-        : setTheCurTrack((curTrack));
+        : setTheCurTrack((playlist.length - 1));
     }
   };
 
+  //funcion para dar play setear a que el estado de play es verdadero
   const play = () => {
     setIsPlaying(true);
     audio.play();
   };
-
+ //funcion para dar pause setear a que el estado de play es falso
   const pause = () => {
     setIsPlaying(false);
     audio.pause();
