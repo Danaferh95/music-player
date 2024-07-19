@@ -42,11 +42,11 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
   const [length, setLength] = useState(0);
   //variable que setea el tiempo que dura la cancion
   const [time, setTime] = useState(0);
-  //el Slider de nuestro Progress ---------------
+  //el Slider de nuestro Progress 
   const [slider, setSlider] = useState(1);
   //variable que almacena el buffer de la cancion(es decir la data que se encuentra cargada)
   const [buffer, setBuffer] = useState(0);
-  //variable con nuestro drag -----------------
+  //variable con nuestro drag 
   const [drag, setDrag] = useState(0);
  //varibale para activar o no el shuffle
   const [shuffled, setShuffled] = useState(false);
@@ -147,38 +147,49 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
 
 
 
-  //Este use effect sirve cuando actualizamos nuestro current track a uno nuevo
-
+ // Este useEffect se ejecuta cuando actualizamos nuestro track actual a uno nuevo
   useEffect(() => {
     if (audio) {
+      // Cambiamos la fuente del audio al URL del track actual
       audio.src = playlist[curTrack].url;
+      // Cargamos el nuevo archivo de audio
       audio.load();
 
+      // Cuando el audio esté listo para reproducirse
       audio.oncanplay = () => {
+        // Actualizamos el título de la canción
         setTitle(playlist[curTrack].title);
+        // Iniciamos la reproducción del audio
         play();
       };
 
+      // Función para manejar el evento de finalización del audio
       const setAudioEnd = () => {
         setHasEnded(!hasEnded);
       };
+      // Agregamos el listener para el evento 'ended'
       audio.addEventListener("ended", setAudioEnd);
 
+      // Función para quitar los listenes cuando cambia el track
       return () => {
+        // Quitamos el listener del evento 'ended'
         audio.removeEventListener("ended", setAudioEnd);
       };
     }
-  }, [curTrack]);
+  }, [curTrack]); // Este efecto se ejecuta cada vez que cambia el 'curTrack'
 
 
-//Este useEffect sirve para actualizar la barra de progresso al hacer drag
-
+  // Este useEffect se ejecuta para actualizar la barra de progreso al hacer drag
   useEffect(() => {
     if (audio) {
+      // Pausamos el audio
       pause();
+      // Calculamos el nuevo tiempo del audio basado en la posición del slider
       const val = Math.round((drag * audio.duration) / 100);
+      // Obtenemos los rangos de buffer del audio
       const bufferedRanges = audio.buffered;
 
+      // Verificamos si el nuevo tiempo está dentro de los rangos de buffer
       let isInBufferedRange = false;
       for (let i = 0; i < bufferedRanges.length; i++) {
         if (val >= bufferedRanges.start(i) && val <= bufferedRanges.end(i)) {
@@ -187,11 +198,14 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
         }
       }
 
+      // Si el nuevo tiempo está en el rango de buffer, actualizamos el tiempo actual del audio
       if (isInBufferedRange) {
         audio.currentTime = val;
       } else {
+        // Si no, agregamos un listener para esperar a que el buffer esté listo
         const waitingHandler = () => {
           if (audio.readyState === 4) {
+            // Quitamos el listener una vez que el buffer está listo
             audio.removeEventListener("waiting", waitingHandler);
             // console.log("waiting for data");
           }
@@ -199,7 +213,7 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
         audio.addEventListener("waiting", waitingHandler);
       }
     }
-  }, [drag]);
+  }, [drag]); // Este efecto se ejecuta cada vez que cambia el 'drag'
 
 
  
@@ -273,7 +287,15 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
     audio.pause();
   };
 
+  //gestiona la actualización del slide cuando se hace drag
+  const handleSliderChange = (e) => {
+    setSlider(e.target.value);
+    setDrag(e.target.value);
+  };
 
+//creamos el HTML dinamico
+//donde tenemos nuestro componente de progreso, aqui le vamos a pasar los valores del slide, bufffer, setSlide, setDrag, 
+//en nuestro button-box tenemos los botones para realizar el seteo del loop, previous, pause, play, next, y shuffle
   return (
     
     <>
@@ -292,11 +314,7 @@ function MusicPlayer({tracks, autoPlayNextTrack, curTrack, setTheCurTrack}) {
         <Progress
           value={slider}
           progress={buffer}
-          onChange={(e) => {
-            setSlider(e.target.value);
-            setDrag(e.target.value);
-            //console.log(drag);
-          }}
+          onChange={handleSliderChange}
           onMouseUp={play}
           onTouchEnd={play}
         />
